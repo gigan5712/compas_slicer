@@ -1,7 +1,9 @@
 import logging
 import math
+from math import degrees, radians
 from compas_slicer.parameters import get_param
-from compas.geometry import Point, Vector
+from compas.geometry import Point, Vector, Rotation
+from compas.geometry import euler_angles_from_matrix,matrix_from_basis_vectors,multiply_matrices
 from compas_slicer.geometry import PrintPoint
 from datetime import datetime
 
@@ -120,6 +122,11 @@ def create_gcode_text(print_organizer, parameters):
         # Calculate relative length
         re_l = ((point_v.pt.x - prev_point.pt.x) ** 2 + (point_v.pt.y - prev_point.pt.y) ** 2 + (
                 point_v.pt.z - prev_point.pt.z) ** 2) ** 0.5
+        # Calculate the tool orientation
+        R= Rotation.from_frame(point_v.frame)
+        Ry = Rotation.from_axis_and_angle([0, 1, 0], math.pi)
+        R = R * Ry
+        ea = euler_angles_from_matrix(R.matrix)
         if k == 0:  # 'First point
             # retract before moving to first point in path if necessary
             if (retraction_min_travel < re_l) and (point_v.extruder_toggle is False):
@@ -130,9 +137,13 @@ def create_gcode_text(print_organizer, parameters):
                 # move to first point in path:
                 gcode += "G1" + " F" + str(feedrate_travel) + "    ;set travel feedrate" + n_l
                 if prev_point.pt.z != point_v.pt.z:
-                    gcode += "G1 X" + '{:.3f}'.format(point_v.pt.x) + " Y" + '{:.3f}'.format(point_v.pt.y) + " Z" + '{:.3f}'.format(point_v.pt.z) + n_l
+                    gcode += "G1 X" + '{:.3f}'.format(point_v.pt.x) + " Y" + '{:.3f}'.format(point_v.pt.y) + " Z" + '{:.3f}'.format(point_v.pt.z) \
+                    + " A" + '{:.3f}'.format(degrees(ea[0])) + " B" + '{:.3f}'.format(degrees(ea[1])) + " C" + '{:.3f}'.format(degrees(ea[2])) \
+                    + n_l
                 else:
-                    gcode += "G1 X" + '{:.3f}'.format(point_v.pt.x) + " Y" + '{:.3f}'.format(point_v.pt.y) + n_l
+                    gcode += "G1 X" + '{:.3f}'.format(point_v.pt.x) + " Y" + '{:.3f}'.format(point_v.pt.y) \
+                    + " A" + '{:.3f}'.format(degrees(ea[0])) + " B" + '{:.3f}'.format(degrees(ea[1])) + " C" + '{:.3f}'.format(degrees(ea[2])) \
+                    + n_l
                 # reverse z-hop after reaching the first point
                 gcode += "G1 F" + str(feedrate_retraction) + "    ;set retraction feedrate" + n_l
                 gcode += "G1" + " Z" + '{:.3f}'.format(point_v.pt.z) + "  ;reverse z-hop" + n_l
@@ -140,10 +151,11 @@ def create_gcode_text(print_organizer, parameters):
                 gcode += "G1" + " E" + str(retraction_length) + "       ;reverse retraction" + n_l
             else:
                 if prev_point.pt.z != point_v.pt.z:
-                    gcode += "G1 X" + '{:.3f}'.format(point_v.pt.x) + " Y" + '{:.3f}'.format(
-                        point_v.pt.y) + " Z" + '{:.3f}'.format(point_v.pt.z) + n_l
+                    gcode += "G1 X" + '{:.3f}'.format(point_v.pt.x) + " Y" + '{:.3f}'.format(point_v.pt.y) + " Z" + '{:.3f}'.format(point_v.pt.z) \
+                    + " A" + '{:.3f}'.format(degrees(ea[0])) + " B" + '{:.3f}'.format(degrees(ea[1])) + " C" + '{:.3f}'.format(degrees(ea[2])) + n_l                     
                 else:
-                    gcode += "G1 X" + '{:.3f}'.format(point_v.pt.x) + " Y" + '{:.3f}'.format(point_v.pt.y) + n_l
+                    gcode += "G1 X" + '{:.3f}'.format(point_v.pt.x) + " Y" + '{:.3f}'.format(point_v.pt.y) \
+                    + " A" + '{:.3f}'.format(degrees(ea[0])) + " B" + '{:.3f}'.format(degrees(ea[1])) + " C" + '{:.3f}'.format(degrees(ea[2])) + n_l
             # set extrusion feedrate: low for adhesion to bed and normal otherwise
             if point_v.pt.z < min_over_z:
                 gcode += "G1" + " F" + str(feedrate_low) + "    ;set low feedrate" + n_l
@@ -154,8 +166,9 @@ def create_gcode_text(print_organizer, parameters):
             e_val = flowrate * 4 * re_l * layer_height * path_width / (math.pi * (filament_diameter ** 2))
             if point_v.pt.z < min_over_z:
                 e_val *= flow_over
-            gcode += "G1 X" + '{:.3f}'.format(point_v.pt.x) + " Y" + '{:.3f}'.format(
-                point_v.pt.y) + " E" + '{:.3f}'.format(e_val) + n_l
+            gcode += "G1 X" + '{:.3f}'.format(point_v.pt.x) + " Y" + '{:.3f}'.format(point_v.pt.y) + " Z" + '{:.3f}'.format(point_v.pt.z) \
+            + " A" + '{:.3f}'.format(degrees(ea[0])) + " B" + '{:.3f}'.format(degrees(ea[1])) + " C" + '{:.3f}'.format(degrees(ea[2])) \
+            + " E" + '{:.3f}'.format(e_val) + n_l
         prev_point = point_v
         if fan_on is False:
             if i * layer_height >= fan_start_z:  # 'Fan On:

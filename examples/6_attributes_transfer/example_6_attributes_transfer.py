@@ -2,6 +2,7 @@ import logging
 import os
 from compas.geometry import Point, Vector, distance_point_plane, normalize_vector
 from compas.datastructures import Mesh
+from compas_slicer.pre_processing import move_mesh_to_point
 import compas_slicer.utilities as slicer_utils
 from compas_slicer.post_processing import simplify_paths_rdp_igl
 from compas_slicer.slicers import PlanarSlicer
@@ -20,6 +21,7 @@ MODEL = 'distorted_v_closed_low_res.obj'
 if __name__ == '__main__':
     # load mesh
     mesh = Mesh.from_obj(os.path.join(DATA_PATH, MODEL))
+    move_mesh_to_point(mesh, Point(500, 0, 0))
 
     # --------------- Add attributes to mesh
     # Face attributes can be anything (ex. float, bool, array, text ...)
@@ -68,6 +70,11 @@ if __name__ == '__main__':
     # --------------- Save printpoints to json (only json-serializable attributes are saved)
     printpoints_data = print_organizer.output_printpoints_dict()
     utils.save_to_json(printpoints_data, OUTPUT_PATH, 'out_printpoints.json')
+
+    # create and output gcode
+    gcode_parameters = {}  # leave all to default
+    gcode_text = print_organizer.output_gcode(gcode_parameters)
+    utils.save_to_text_file(gcode_text, OUTPUT_PATH, 'my_gcode.gcode')
 
     # --------------- Print the info to see the attributes of the printpoints (you can also visualize them on gh)
     print_organizer.printout_info()

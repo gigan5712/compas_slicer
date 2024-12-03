@@ -13,5 +13,7 @@ def layers_default_param(key):
 default_parameters = \
     {
         'avg_layer_height': 5.0,
+        'min_layer_height': 0.1,
+        'max_layer_height': 50.0,
         'vertical_layers_max_centroid_dist': 25.0
     }

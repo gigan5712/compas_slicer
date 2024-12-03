@@ -5,9 +5,10 @@ from compas_slicer.utilities import utils
 from compas_slicer.geometry import Layer, VerticalLayer
 from compas_slicer.post_processing import seams_align
 from compas_slicer.post_processing import unify_paths_orientation
+from random import sample
 import logging
 from abc import abstractmethod
-from compas.datastructures import mesh_bounding_box
+#from compas.datastructures import mesh_bounding_box
 from compas.geometry import distance_point_point_sqrd
 
 logger = logging.getLogger('logger')
@@ -150,7 +151,7 @@ class BaseSlicer(object):
                 self.layers.remove(layer)
 
     def find_vertical_layers_with_first_path_on_base(self):
-        bbox = mesh_bounding_box(self.mesh)
+        bbox = self.mesh.aabb()
         z_min = min([p[2] for p in bbox])
         paths_on_base = []
         vertical_layer_indices = []
@@ -225,16 +226,16 @@ class BaseSlicer(object):
         # any non-serializable attributes (by checking a random face and a random vertex, assuming
         # that all faces and vertices share the same types of attributes).
         mesh = self.mesh.copy()
-        v_key = mesh.get_any_vertex()
-        v_attrs = mesh.vertex_attributes(v_key)
+        v_key = list(mesh.vertices())
+        v_attrs = mesh.vertex_attributes(v_key[0])
         for attr_key in v_attrs:
             if not utils.is_jsonable(v_attrs[attr_key]):
                 logger.error('vertex : ' + attr_key + str(v_attrs[attr_key]))
                 for v in mesh.vertices():
                     mesh.unset_vertex_attribute(v, attr_key)
 
-        f_key = mesh.get_any_face()
-        f_attrs = mesh.face_attributes(f_key)
+        f_key = list(mesh.faces())
+        f_attrs = mesh.face_attributes(f_key[0])
         for attr_key in f_attrs:
             if not utils.is_jsonable(f_attrs[attr_key]):
                 logger.error('face : ' + attr_key, f_attrs[attr_key])
@@ -242,7 +243,7 @@ class BaseSlicer(object):
 
         # fill data dictionary with slicer info
         data = {'layers': self.get_layers_dict(),
-                'mesh': mesh.to_data(),
+                'mesh': mesh.to_json(),
                 'layer_height': self.layer_height}
         return data
 

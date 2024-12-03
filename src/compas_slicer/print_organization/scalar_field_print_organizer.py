@@ -7,6 +7,7 @@ import logging
 from compas_slicer.pre_processing import GradientEvaluation
 from compas_slicer.utilities.attributes_transfer import transfer_mesh_attributes_to_printpoints
 from compas_slicer.parameters import get_param
+from compas_slicer.geometry import PrintPoint
 import compas_slicer
 
 logger = logging.getLogger('logger')

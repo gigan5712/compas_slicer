@@ -15,14 +15,13 @@ logging.basicConfig(format='%(levelname)s-%(message)s', level=logging.INFO)
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), 'data')
 OUTPUT_PATH = slicer_utils.get_output_directory(DATA_PATH)
-MODEL = 'geom_to_slice.obj'
-BASE = 'custom_base.obj'
+MODEL = 'mesh.obj'
 
 if __name__ == '__main__':
 
     # --- load meshes
     mesh = Mesh.from_obj(os.path.join(DATA_PATH, MODEL))
-    base = Mesh.from_obj(os.path.join(DATA_PATH, BASE))
+    base = Mesh.from_meshgrid(1,10,1,10)
     print_volume_x = get_param({}, key='print_volume_x', defaults_type='gcode')  # in mm
     print_volume_y = get_param({}, key='print_volume_y', defaults_type='gcode')  # in mm
     move_mesh_to_point(mesh, Point(print_volume_x/2, 0, 0))

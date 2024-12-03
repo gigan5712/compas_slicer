@@ -54,24 +54,25 @@ def simplify_paths_rdp_igl(slicer, threshold):
         Controls the degree of polyline simplification.
         Low threshold removes few points, high threshold removes many points.
     """
-    try:
-        # utils.check_package_is_installed('igl')
-        logger.info("Paths simplification rdp - igl")
-        remaining_pts_num = 0
+    # try:
+    #     # utils.check_package_is_installed('igl')
+    #     logger.info("Paths simplification rdp - igl")
+    #     remaining_pts_num = 0
 
-        for i, layer in enumerate(slicer.layers):
-            if not layer.is_raft:  # no simplification necessary for raft layer
-                for path in layer.paths:
-                    pts = np.array([[pt[0], pt[1], pt[2]] for pt in path.points])
-                    S, J, Q = igl.ramer_douglas_peucker(pts, threshold)
-                    path.points = [Point(pt[0], pt[1], pt[2]) for pt in S]
-                    remaining_pts_num += len(path.points)
-        logger.info('%d Points remaining after rdp simplification' % remaining_pts_num)
+    #     for i, layer in enumerate(slicer.layers):
+    #         if not layer.is_raft:  # no simplification necessary for raft layer
+    #             for path in layer.paths:
+    #                 pts = np.array([[pt[0], pt[1], pt[2]] for pt in path.points])
+    #                 S, J, Q = igl.ramer_douglas_peucker(pts, threshold)
+    #                 path.points = [Point(pt[0], pt[1], pt[2]) for pt in S]
+    #                 remaining_pts_num += len(path.points)
+    #     logger.info('%d Points remaining after rdp simplification' % remaining_pts_num)
 
-    except PluginNotInstalledError:
-        logger.info("Libigl is not installed. Falling back to python rdp function")
-        simplify_paths_rdp(slicer, threshold)
+    # except PluginNotInstalledError:
+    #     logger.info("Libigl is not installed. Falling back to python rdp function")
+    #     simplify_paths_rdp(slicer, threshold)
 
+    simplify_paths_rdp(slicer, threshold)
 
 if __name__ == "__main__":
     pass

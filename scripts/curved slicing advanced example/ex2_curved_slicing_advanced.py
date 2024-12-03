@@ -4,7 +4,7 @@ import logging
 import compas_slicer.utilities as utils
 from compas_slicer.slicers import InterpolationSlicer
 from compas_slicer.post_processing import simplify_paths_rdp_igl
-from compas_slicer.pre_processing import InterpolationSlicingPreprocessor
+from compas_slicer.pre_processing import InterpolationSlicingPreprocessor,move_mesh_to_point
 from compas_slicer.pre_processing import create_mesh_boundary_attributes
 from compas_slicer.print_organization import InterpolationPrintOrganizer
 from compas_slicer.print_organization import set_extruder_toggle
@@ -12,7 +12,7 @@ from compas_slicer.print_organization import add_safety_printpoints, set_wait_ti
 from compas_slicer.print_organization import smooth_printpoints_up_vectors, set_blend_radius
 from compas_slicer.post_processing import generate_brim, seams_smooth
 import time, math
-
+from compas.geometry import Point
 logger = logging.getLogger('logger')
 logging.basicConfig(format='%(levelname)s - %(message)s', level=logging.INFO)
 
@@ -39,6 +39,7 @@ def main():
 
     ### --- Load initial_mesh
     mesh = Mesh.from_obj(os.path.join(DATA_PATH, OBJ_INPUT_NAME))
+    move_mesh_to_point(mesh, Point(500, 0, 0))
 
     # --- Load targets (boundaries)
     low_boundary_vs = utils.load_from_json(DATA_PATH, 'boundaryLOW.json')
@@ -111,6 +112,11 @@ def main():
 
             printpoints_data = print_organizer.output_nested_printpoints_dict()
             utils.save_to_json(printpoints_data, OUTPUT_PATH, 'out_printpoints_nested_%d.json' % i)
+
+            # create and output gcode
+            gcode_parameters = {}  # leave all to default
+            gcode_text = print_organizer.output_gcode(gcode_parameters)
+            utils.save_to_text_file(gcode_text, OUTPUT_PATH, 'my_gcode_%d.gcode' % i)
 
     end_time = time.time()
     print("Total elapsed time", round(end_time - start_time, 2), "seconds")

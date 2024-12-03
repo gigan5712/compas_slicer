@@ -16,8 +16,8 @@ default_parameters = \
         'nozzle_diameter': 0.4,  # in mm
         'filament diameter': 1.75,  # in mm, for calculating E
         'delta': False,  # boolean for delta printers
-        'print_volume_x': 300,  # in mm
-        'print_volume_y': 300,  # in mm
+        'print_volume_x': 1000,  # in mm
+        'print_volume_y': 1000,  # in mm
         'print_volume_z': 600,  # in mm
 
         # Dimensional parameters

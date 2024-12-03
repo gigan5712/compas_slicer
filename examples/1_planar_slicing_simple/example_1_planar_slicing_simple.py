@@ -40,12 +40,11 @@ def main():
     # ==========================================================================
     # Load mesh
     # ==========================================================================
-    compas_mesh = Mesh.from_obj(os.path.join(DATA, MODEL))
-
+    compas_mesh = Mesh.from_obj(os.path.join(DATA, MODEL))  
     # ==========================================================================
     # Move to origin
     # ==========================================================================
-    move_mesh_to_point(compas_mesh, Point(0, 0, 0))
+    move_mesh_to_point(compas_mesh, Point(500, 0, 0))
 
     # ==========================================================================
     # Slicing
@@ -118,6 +117,11 @@ def main():
 
     printpoints_data = print_organizer.output_nested_printpoints_dict()
     utils.save_to_json(printpoints_data, OUTPUT_DIR, 'out_printpoints_nested.json')
+
+    # create and output gcode
+    gcode_parameters = {}  # leave all to default
+    gcode_text = print_organizer.output_gcode(gcode_parameters)
+    utils.save_to_text_file(gcode_text, OUTPUT_DIR, 'my_gcode.gcode')
 
     end_time = time.time()
     print("Total elapsed time", round(end_time - start_time, 2), "seconds")
