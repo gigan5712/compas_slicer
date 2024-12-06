@@ -15,7 +15,7 @@ logging.basicConfig(format='%(levelname)s-%(message)s', level=logging.INFO)
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), 'data')
 OUTPUT_PATH = slicer_utils.get_output_directory(DATA_PATH)
-MODEL = 'mesh.obj'
+MODEL = 'pipe.obj'
 
 if __name__ == '__main__':
 
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     slicer = ScalarFieldSlicer(mesh, u, no_of_isocurves=50)
     slicer.slice_model()
     # simplify_paths_rdp(slicer, threshold=0.3)
-    slicer_utils.save_to_json(slicer.to_data(), OUTPUT_PATH, 'isocontours.json')  # save results to json
+    # slicer_utils.save_to_json(slicer.to_data(), OUTPUT_PATH, 'isocontours.json')  # save results to json
 
     # --- Print organization calculations (i.e. generation of printpoints with fabrication-related information)
     simplify_paths_rdp_igl(slicer, threshold=0.3)

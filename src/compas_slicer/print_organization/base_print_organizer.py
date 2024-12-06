@@ -2,7 +2,7 @@ import compas_slicer
 import logging
 from compas.geometry import Vector, distance_point_point, norm_vector, normalize_vector, subtract_vectors, \
     cross_vectors, scale_vector
-from compas.itertools import pairwise
+from compas.utilities import pairwise
 import numpy as np
 from abc import abstractmethod
 

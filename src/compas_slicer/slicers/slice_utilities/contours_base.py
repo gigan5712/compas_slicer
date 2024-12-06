@@ -1,5 +1,5 @@
 from compas.geometry import Point, distance_point_point_sqrd
-from compas.itertools import pairwise
+from compas.utilities import pairwise
 from compas_slicer.slicers.slice_utilities import create_graph_from_mesh_edges, sort_graph_connected_components
 import compas_slicer.utilities as utils
 import logging

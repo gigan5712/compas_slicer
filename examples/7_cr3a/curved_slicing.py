@@ -18,7 +18,8 @@ import time
 logger = logging.getLogger('logger')
 logging.basicConfig(format='%(levelname)s - %(message)s', level=logging.INFO)
 
-DATA_PATH = os.path.join(os.path.dirname(__file__), 'data_vase')
+# DATA_PATH = os.path.join(os.path.dirname(__file__), 'data')
+DATA_PATH = os.path.join(os.path.dirname(__file__), 'data')
 OUTPUT_PATH = utils.get_output_directory(DATA_PATH)
 OBJ_INPUT_NAME = os.path.join(DATA_PATH, 'mesh.obj')
 

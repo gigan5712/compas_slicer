@@ -243,7 +243,7 @@ class BaseSlicer(object):
 
         # fill data dictionary with slicer info
         data = {'layers': self.get_layers_dict(),
-                'mesh': mesh.to_json(),
+                'mesh': mesh.to_data(),
                 'layer_height': self.layer_height}
         return data
 
